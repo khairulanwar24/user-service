@@ -18,8 +18,10 @@ type User struct {
 	// Name adalah nama lengkap pengguna. Maksimal 100 karakter dan tidak boleh kosong
 	Name string `gorm:"type:varchar(100);not null"`
 
+	Username string `gorm:"type:varchar(20);not null"`
+
 	// Pass adalah tempat menyimpan password pengguna yang telah dienkripsi. Maksimal 255 karakter
-	Pass string `gorm:"type:varchar(255);not null"`
+	Password string `gorm:"type:varchar(255);not null"`
 
 	// PhoneNumber adalah nomor HP pengguna. Maksimal 15 karakter
 	PhoneNumber string `gorm:"type:varchar(15);not null"`
