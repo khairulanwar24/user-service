@@ -1,6 +1,8 @@
 package dto
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 // LoginRequest adalah format data yang kita harapkan saat user mengirim permintaan Login.
 // Tag `json:"..."` berarti data ini akan dikirim dalam format JSON.
@@ -15,6 +17,7 @@ type LoginRequest struct {
 type UserResponse struct {
 	UUID        uuid.UUID `json:"uuid"`        // ID unik dan aman dari pengguna
 	Name        string    `json:"name"`        // Nama lengkap pengguna
+	Username    string    `json:"username"`    // Username pengguna
 	Email       string    `json:"email"`       // Email pengguna
 	Role        string    `json:"role"`        // Nama perannya (misal: "Admin")
 	PhoneNumber string    `json:"phoneNumber"` // Nomor HP pengguna
