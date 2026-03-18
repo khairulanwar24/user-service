@@ -62,7 +62,7 @@ func (r *UserRepository) Update(ctx context.Context, req *dto.UpdateRequest, uui
 	user := models.User{
 		Name:        req.Name,
 		Username:    req.Username,
-		Password:    req.Password,
+		Password:    *req.Password,
 		PhoneNumber: req.PhoneNumber,
 		Email:       req.Email,
 	}
