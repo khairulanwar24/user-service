@@ -92,7 +92,7 @@ func (u *UserService) Login(ctx context.Context, req *dto.LoginRequest) (*dto.Lo
 		PhoneNumber: user.PhoneNumber, // Nomor HP
 		Email:       user.Email,       // Email
 		// Strings ToLower untuk mengubah huruf kapital pada Roles menjadi huruf kecil (admin -> admin).
-		Role:        strings.ToLower(user.Role.Code),
+		Role: strings.ToLower(user.Role.Code),
 	}
 
 	// Langkah 4: Membuat lembar koper "Claims" tadi yang isinya Token beserta datanya, plus waktu kedaluwarsa.
@@ -114,7 +114,7 @@ func (u *UserService) Login(ctx context.Context, req *dto.LoginRequest) (*dto.Lo
 		return nil, err
 	}
 
-	// Langkah 6: Siapkan bingkisan respons berisi profil user dan cetakan token bentuk huruf (string)  
+	// Langkah 6: Siapkan bingkisan respons berisi profil user dan cetakan token bentuk huruf (string)
 	response := &dto.LoginResponse{
 		User:  *data,       // Value dari isi variable data (pointer yang diambil valuenya)
 		Token: tokenString, // String kombinasi karakter JWT
@@ -190,12 +190,12 @@ func (u *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (*
 
 	// Langkah 5: Proses kirim ke layer dasar Repository agar database memproses aksi daftar dan menyimpannya (Insert).
 	user, err := u.repository.GetUser().Register(ctx, &dto.RegisterRequest{
-		Name:        req.Name,                   // Menyimpan input Nama
-		Username:    req.Username,               // Menyimpan input Username login
-		Password:    string(hashedPassword),     // WAJIB: Menyimpan password yang sudah di Gembok/Hash (Dikonversi ke text string)
-		PhoneNumber: req.PhoneNumber,            // Nomor Telepon 
-		Email:       req.Email,                  // Alamat surat eletronik
-		RoleID:      constants.Customer,         // Tentukan semua pendaftar baru perannya (Role) sebagai tipe "Customer" 
+		Name:        req.Name,               // Menyimpan input Nama
+		Username:    req.Username,           // Menyimpan input Username login
+		Password:    string(hashedPassword), // WAJIB: Menyimpan password yang sudah di Gembok/Hash (Dikonversi ke text string)
+		PhoneNumber: req.PhoneNumber,        // Nomor Telepon
+		Email:       req.Email,              // Alamat surat eletronik
+		RoleID:      constants.Customer,     // Tentukan semua pendaftar baru perannya (Role) sebagai tipe "Customer"
 	})
 
 	// Cek apakah database bermasalah sewaktu menyimpan
@@ -223,12 +223,12 @@ func (u *UserService) Register(ctx context.Context, req *dto.RegisterRequest) (*
 func (u *UserService) Update(ctx context.Context, request *dto.UpdateRequest, uuid string) (*dto.UserResponse, error) {
 	// Kita akan menyiapkan "keranjang kosong" atau variabel penampungan di awal supaya teratur.
 	var (
-		password                  string          // Keranjang wadah penampung teks dari password setelah diubah 
-		checkUsername, checkEmail *models.User    // Keranjang tipe data ceklis saat periksa nama/email
-		hashedPassword            []byte          // Keranjang khusus wujud bilangan byte biner
-		user, userResult          *models.User    // Keranjang isi data pengguna satu dari tarikan, satu pasca revisi
-		err                       error           // Keranjang khusus penanganan jika terjadi masalah (error)
-		data                      dto.UserResponse// Keranjang khusus kemasan yang ramah pengguna
+		password                  string           // Keranjang wadah penampung teks dari password setelah diubah
+		checkUsername, checkEmail *models.User     // Keranjang tipe data ceklis saat periksa nama/email
+		hashedPassword            []byte           // Keranjang khusus wujud bilangan byte biner
+		user, userResult          *models.User     // Keranjang isi data pengguna satu dari tarikan, satu pasca revisi
+		err                       error            // Keranjang khusus penanganan jika terjadi masalah (error)
+		data                      dto.UserResponse // Keranjang khusus kemasan yang ramah pengguna
 	)
 
 	// Langkah 1: Tarik dan muat profil si pengguna sesuai UUID nya ke dalam variabel user.
@@ -241,7 +241,7 @@ func (u *UserService) Update(ctx context.Context, request *dto.UpdateRequest, uu
 	// Langkah 2: Pengecekan sebelum merubah kolom Username.
 	// Tanya ke helper isUsernameExist() apakah username bari yang diminta sudah ada (true/false).
 	isUsernameExist := u.isUsernameExist(ctx, request.Username)
-	// Kalau nilai (true) berarti dipakai orang lain, TAPI... pastikan apakah username-nya dia sendiri atau beda. (jika dia ngga rubah kolomnya abaikan) 
+	// Kalau nilai (true) berarti dipakai orang lain, TAPI... pastikan apakah username-nya dia sendiri atau beda. (jika dia ngga rubah kolomnya abaikan)
 	if isUsernameExist && user.Username != request.Username {
 		// Kalau beda dengan datanya yang lama, cek pakai databasenya langsung juga untuk jamin konsistensi.
 		checkUsername, err = u.repository.GetUser().FindByUsername(ctx, request.Username)
@@ -281,7 +281,7 @@ func (u *UserService) Update(ctx context.Context, request *dto.UpdateRequest, uu
 			return nil, errConstant.ErrPasswordDoesNotMatch
 		}
 
-		// Karena ingin mengubah jadinya kita Generate (Enkripsi baru) kata sandi tsb. 
+		// Karena ingin mengubah jadinya kita Generate (Enkripsi baru) kata sandi tsb.
 		hashedPassword, err = bcrypt.GenerateFromPassword([]byte(*request.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return nil, err // Return ketika gagal Enkripsi.
@@ -306,7 +306,7 @@ func (u *UserService) Update(ctx context.Context, request *dto.UpdateRequest, uu
 
 	// Langkah 6: Konstruksi atau bungkus lagi pembalasan menggunakan dto bentuk Response
 	data = dto.UserResponse{
-		UUID:        userResult.UUID,          // Memberikan data userResult terbaru ke dto pembungkus
+		UUID:        userResult.UUID, // Memberikan data userResult terbaru ke dto pembungkus
 		Name:        userResult.Name,
 		Username:    userResult.Username,
 		PhoneNumber: userResult.PhoneNumber,
@@ -321,7 +321,7 @@ func (u *UserService) Update(ctx context.Context, request *dto.UpdateRequest, uu
 func (u *UserService) GetUserLogin(ctx context.Context) (*dto.UserResponse, error) {
 	// Menyiapkan variabel keranjang...
 	var (
-		// Ingat kita bawa Context? di dalam aliran context ini sudah disematkan identitas login dari tingkat Middleware. 
+		// Ingat kita bawa Context? di dalam aliran context ini sudah disematkan identitas login dari tingkat Middleware.
 		// Context.Value itu ditarik memakai kata kunci (constants.UserLogin) dan di konfirmasikan tipe objectnya (type-assertion) dari DTO UserResponse.
 		userLogin = ctx.Value(constants.UserLogin).(*dto.UserResponse)
 		data      dto.UserResponse // Ini wadah rapinya.
