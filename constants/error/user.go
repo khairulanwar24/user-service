@@ -6,6 +6,7 @@ var (
 	ErrUserNotFound         = errors.New("user not found")
 	ErrPasswordIncorrect    = errors.New("password incorrect")
 	ErrUsernameExists       = errors.New("username already exists")
+	ErrEmailExists          = errors.New("email already exists")
 	ErrPasswordDoesNotMatch = errors.New("password does not match")
 )
 
