@@ -17,7 +17,7 @@ type Registry struct {
 }
 
 // IServiceRegistry adalah sebuah antarmuka (interface) yang mendefinisikan kontrak apa saja yang harus ada di dalam Registry.
-// Interface ini menyatakan bahwa sesiapa yang menggunakannya harus menaati kontrak untuk memiliki fungsi GetUser() 
+// Interface ini menyatakan bahwa sesiapa yang menggunakannya harus menaati kontrak untuk memiliki fungsi GetUser()
 // yang mengembalikan nilai berupa services.IUserService.
 type IServiceRegistry interface {
 	GetUser() services.IUserService
