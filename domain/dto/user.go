@@ -26,7 +26,7 @@ type UserResponse struct {
 // LoginResponse adalah bentuk data atau respon yang akan diterima sistem/aplikasi setelah loginnya berhasil.
 type LoginResponse struct {
 	User  UserResponse `json:"user"`  // Berisi data profil singkat dari user yang berhasil login
-	Token string       `json:"token"` // Berisi token JWT sebagai kunci rahasia untuk mengakses fitur lainnya
+	Token string      `json:"token"` // Berisi token JWT sebagai kunci rahasia untuk mengakses fitur lainnya
 }
 
 // RegisterRequest adalah data yang kita butuhkan dari form saat user ingin mendaftar (buat akun baru).
