@@ -29,7 +29,7 @@ type IUserController interface {
 }
 
 // NewUserControlle adalah fungsi inisialisasi (pembentuk) untuk menghasilkan objek UserController
-func NewUserControlle(service services.IServiceRegistry) IUserController {
+func NewUserController(service services.IServiceRegistry) IUserController {
 	return &UserController{service: service}
 }
 
