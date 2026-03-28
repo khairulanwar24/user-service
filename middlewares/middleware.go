@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
@@ -9,12 +10,14 @@ import (
 	"user-service/common/response"
 	"user-service/config"
 	"user-service/constants"
+	services "user-service/services/user"
 
 	errConstant "user-service/constants/error"
 
 	"github.com/didip/tollbooth"
 	"github.com/didip/tollbooth/limiter"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/sirupsen/logrus"
 )
 
@@ -129,4 +132,92 @@ func validateAPIKey(c *gin.Context) error {
 
 	// Jika kodenya persis, berarti aksesnya SAH. Lanjutkan. (pengembalian nilai nil menandakan tak ada yang salah).
 	return nil
+}
+
+// validateBearerToken adalah fungsi untuk memastikan token JWT yang dibawa user benar dan valid.
+func validateBearerToken(c *gin.Context, token string) error {
+	// 1. Cek dulu apakah di dalam token terdapat teks "Bearer".
+	if !strings.Contains(token, "Bearer") {
+		// Jika tidak ada teks "Bearer", berarti formatnya salah. Kembalikan error "Unauthorized".
+		return errConstant.ErrUnauthorized
+	}
+
+	// 2. Ambil isi tokennya saja (buang tulisan "Bearer ") menggunakan fungsi bantuan yang kita buat di atas.
+	tokenString := extractBearerToken(token)
+	if tokenString == "" {
+		// Jika isi tokennya kosong setelah dibersihkan, kembalikan error "Unauthorized".
+		return errConstant.ErrUnauthorized
+	}
+
+	// 3. Menyiapkan variabel 'claims' sebagai wadah kosong.
+	// Claims adalah data internal user yang dititipkan/disimpan di dalam token JWT (misal: ID user, email).
+	claims := &services.Claims{}
+
+	// 4. Proses membaca token menggunakan package pihak ketiga (golang-jwt).
+	tokenJwt, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		// 4a. Memeriksa apakah algoritma enkripsi token tersebut adalah algoritma HMAC.
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			// Jika orang jahat mencoba memakai algoritma enkripsi abal-abal, tolak tokennya!
+			return nil, errConstant.ErrInvalidToken
+		}
+
+		// 4b. Jika algoritmanya sah, kita berikan "Kunci Rahasia" (JwtSecretKey) ke package jwt.
+		// Kunci rahasia ini dipakai package JWT untuk membuktikan keaslian token.
+		jwtSecret := []byte(config.Config.JwtSecretKey)
+		return jwtSecret, nil
+	})
+
+	// 5. Cek apakah ada error saat membaca token ATAU jika hasil pemeriksaan menyatakan token invalid (misal: kadaluwarsa).
+	if err != nil || !tokenJwt.Valid {
+		return errConstant.ErrUnauthorized
+	}
+
+	// 6. Menyimpan data user (dari claims) ke dalam isi Request (Context Golang biasa).
+	// Ini dilakukan agar fungsi-fungsi di controller nanti gampang kalau mau ambil data spesifik user yang sedang login.
+	userLogin := c.Request.WithContext(context.WithValue(c.Request.Context(), constants.UserLogin, claims.User))
+
+	// 7. Mengganti isi Request gin (router) dengan Request baru yang sudah ditempeli info user tadi.
+	c.Request = userLogin
+
+	// 8. Menyimpan raw token ke dalam gin Context untuk bisa diakses cepat jika diperlukan.
+	c.Set(constants.Token, token)
+
+	// Semua aman! Kembalikan 'nil' (tidak ada error).
+	return nil
+}
+
+// Authenticate adalah middleware keamanan utama kita.
+// Rute (API) apapun yang melewati middleware ini hanya bisa diakses oleh pelanggan yang sudah login & punya API Key.
+func Authenticate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var err error
+
+		// 1. Ambil nilai header yang bernama "Authorization" dari request pengguna yang masuk.
+		token := c.GetHeader(constants.Authorization)
+		if token == "" {
+			// Jika sama sekali tidak dikirim token (kosong), lemparkan error tidak punya izin akses.
+			responseUnauthorized(c, errConstant.ErrUnauthorized.Error())
+			return
+		}
+
+		// 2. Jika token terisi, maka verifikasi apakah format JWT miliknya valid dan tidak rusak / dicurangi?
+		err = validateBearerToken(c, token)
+		if err != nil {
+			// Jika hasilnya ada error, tolak permintaannya!
+			responseUnauthorized(c, err.Error())
+			return
+		}
+
+		// 3. Setelah lolos cek JWT, verifikasi lagi apakah API Key (kode aplikasi) si pengguna cocok dengan server kita?
+		err = validateAPIKey(c)
+		if err != nil {
+			// Jika gagal di langkah kunci API, sekali lagi tolak permintaannya!
+			responseUnauthorized(c, err.Error())
+			return
+		}
+
+		// 4. Lulus penjagaan bertingkat ganda! Izinkan pelintas masuk / jalan terus ke Controller tujuan.
+		c.Next()
+	}
 }
