@@ -1,25 +1,23 @@
-// Package routes menaungi semua file yang berhubungan dengan alamat API (URL Endpoint).
 package routes
 
 import (
 	"user-service/controllers"
-	// Import rute-rute spesifik (dalam hal ini rute milik user).
 	routes "user-service/routes/user"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Registry (Pusat Pendaftaran Rute) adalah sebuah struct yang berfungsi sebagai 
+// Registry (Pusat Pendaftaran Rute) adalah sebuah struct yang berfungsi sebagai
 // pangkalan utama untuk merangkai semua jalur rute aplikasi kita menjadi satu.
 type Registry struct {
 	// 'controller' adalah jembatan menuju logika bisnis yang akan dipanggil oleh rute.
 	controller controllers.IControllerRegistry
 	// 'group' adalah sekumpulan alamat rute dari framework Gin.
-	group      *gin.RouterGroup
+	group *gin.RouterGroup
 }
 
 // IRouteRegister adalah kontrak antar muka (interface) yang wajib ditaati.
-// Aturan utamanya: siapa pun pembuat rute, mereka wajib punya fungsi Serve() 
+// Aturan utamanya: siapa pun pembuat rute, mereka wajib punya fungsi Serve()
 // untuk menghidupkan/menyajikan rutenya.
 type IRouteRegister interface {
 	Serve()
