@@ -1,4 +1,4 @@
-package seeder
+package seeders
 
 import (
 	"user-service/constants"
@@ -16,7 +16,7 @@ func RunUserSeeder(db *gorm.DB) {
 	// Menghasilkan hash password dari nilai plain text "admin" menggunakan bcrypt
 	// dengan tingkat keamanan (cost) bawaan (DefaultCost).
 	password, _ := bcrypt.GenerateFromPassword([]byte("admin"), bcrypt.DefaultCost)
-	
+
 	// Membuat representasi objek User untuk dideklarasikan sebagai data awal (admin).
 	user := models.User{
 		UUID:        uuid.New(),
@@ -36,7 +36,7 @@ func RunUserSeeder(db *gorm.DB) {
 		logrus.Errorf("Failed to seed user: %v", err)
 		panic(err)
 	}
-	
+
 	// Memberikan pesan log informasi jika user berhasil di-seed (atau sudah diverifikasi ada).
 	logrus.Infof("user %s successfully seeded", user.Username)
 

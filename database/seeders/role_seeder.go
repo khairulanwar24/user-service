@@ -1,4 +1,4 @@
-package seeder
+package seeders
 
 import (
 	"user-service/domain/models"
