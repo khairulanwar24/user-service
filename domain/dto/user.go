@@ -15,18 +15,18 @@ type LoginRequest struct {
 // UserResponse adalah format data profil user yang akan kita kembalikan (tampilkan) ke pengguna.
 // Sengaja dibuat terpisah agar password dan data rahasia lainnya tidak ikut terkirim ke publik.
 type UserResponse struct {
-	UUID        uuid.UUID `json:"uuid"`        // ID unik dan aman dari pengguna
-	Name        string    `json:"name"`        // Nama lengkap pengguna
-	Username    string    `json:"username"`    // Username pengguna
-	Email       string    `json:"email"`       // Email pengguna
-	Role        string    `json:"role"`        // Nama perannya (misal: "Admin")
-	PhoneNumber string    `json:"phoneNumber"` // Nomor HP pengguna
+	UUID        uuid.UUID `json:"uuid"`           // ID unik dan aman dari pengguna
+	Name        string    `json:"name"`           // Nama lengkap pengguna
+	Username    string    `json:"username"`       // Username pengguna
+	Email       string    `json:"email"`          // Email pengguna
+	Role        string    `json:"role,omitempty"` // Nama perannya (misal: "Admin")
+	PhoneNumber string    `json:"phoneNumber"`    // Nomor HP pengguna
 }
 
 // LoginResponse adalah bentuk data atau respon yang akan diterima sistem/aplikasi setelah loginnya berhasil.
 type LoginResponse struct {
 	User  UserResponse `json:"user"`  // Berisi data profil singkat dari user yang berhasil login
-	Token string      `json:"token"` // Berisi token JWT sebagai kunci rahasia untuk mengakses fitur lainnya
+	Token string       `json:"token"` // Berisi token JWT sebagai kunci rahasia untuk mengakses fitur lainnya
 }
 
 // RegisterRequest adalah data yang kita butuhkan dari form saat user ingin mendaftar (buat akun baru).
