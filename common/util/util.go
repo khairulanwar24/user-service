@@ -7,6 +7,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	_ "github.com/spf13/viper/remote"
 )
 
 // BindFromJSON adalah fungsi untuk membaca file konfigurasi berformat JSON
@@ -68,10 +69,10 @@ func SetEnvFromConsulKV(v *viper.Viper) error {
 			// reflect.ValueOf digunakan untuk mengecek tipe data asli dari 'v'
 			valOf = reflect.ValueOf(v)
 			// val adalah variabel penampung untuk menyimpan data setelah diubah menjadi teks (string)
-			val   string
+			val string
 		)
 
-		// Memeriksa tipe data dari 'v' dan mengubahnya menjadi format string 
+		// Memeriksa tipe data dari 'v' dan mengubahnya menjadi format string
 		// agar bisa disimpan sebagai OS Environment Variable.
 		switch valOf.Kind() {
 		case reflect.String:
@@ -89,9 +90,6 @@ func SetEnvFromConsulKV(v *viper.Viper) error {
 		case reflect.Bool:
 			// Jika tipenya boolean (true/false), ubah jadi teks "true" atau "false".
 			val = strconv.FormatBool(valOf.Bool())
-		default:
-			// Jika tipe data di luar yang dikenali, program dihentikan dengan pesan error (panic).
-			panic("unsupported type")
 		}
 
 		// Menyimpan pasangan nilai 'k' (kunci) dan 'val' (nilai string) ke dalam OS Environment Variable.
@@ -117,7 +115,7 @@ func BindFromConsul(dest any, endPoint, path string) error {
 	v := viper.New()
 	// Menentukan bahwa format konfigurasi yang akan dibaca adalah JSON.
 	v.SetConfigType("json")
-	
+
 	// Menambahkan provider (penyedia) konfigurasi remote, yaitu "consul".
 	err := v.AddRemoteProvider("consul", endPoint, path)
 	if err != nil {
@@ -142,7 +140,7 @@ func BindFromConsul(dest any, endPoint, path string) error {
 		return err
 	}
 
-	// Memanggil fungsi SetEnvFromConsulKV untuk menyimpan nilai konfigurasi 
+	// Memanggil fungsi SetEnvFromConsulKV untuk menyimpan nilai konfigurasi
 	// tersebut ke dalam Environment Variables sistem operasi.
 	err = SetEnvFromConsulKV(v)
 	if err != nil {

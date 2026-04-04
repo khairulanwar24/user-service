@@ -1,9 +1,14 @@
 name: booking-order-app # change this to your app name
 services:
-  user-service: # change this to your service name
-    container_name: user-service # change this to your service name
-    image: sikoding20/user-service # change this to your image name
+  user-service:
+    container_name: user-service
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "8001:8001" # change this to your port
+      - "8001:8001"
     env_file:
       - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
