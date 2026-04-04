@@ -4,7 +4,8 @@ import (
 	"os"                       // Package bawaan Go untuk berinteraksi dengan sistem operasi (misalnya membaca environment variable)
 	"user-service/common/util" // Package utility/bantuan bawaan dari project ini sendiri
 
-	"github.com/sirupsen/logrus" // Library eksternal untuk melakukan logging (mencatat aktivitas/error)
+	"github.com/sirupsen/logrus"      // Library eksternal untuk melakukan logging (mencatat aktivitas/error)
+	_ "github.com/spf13/viper/remote" // Library eksternal untuk membaca konfigurasi dari Consul
 )
 
 // Config adalah variabel global yang akan menyimpan seluruh konfigurasi aplikasi.
